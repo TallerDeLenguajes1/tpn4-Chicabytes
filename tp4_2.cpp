@@ -12,10 +12,12 @@ typedef struct Tar{
 void CargaTarea(Tarea **TareasPendientes, int cantidad);
 void CambioTareas(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant); 
 void Mostrar(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant);
+void BuscarPorID(Tarea **TareaBuscada, int cant_tareas, int id);
 
 int main (void){
     srand(time(NULL));
     int canti_tareas = 0;
+    int id;
     while(canti_tareas == 0 || canti_tareas > 10)
     {
         printf("Ingrese la cantidad de tareas a realizar: ");
@@ -27,7 +29,10 @@ int main (void){
     CargaTarea(TareasPendientes, canti_tareas);
     CambioTareas(TareasPendientes, TareasRealizadas, canti_tareas);
     Mostrar(TareasPendientes, TareasRealizadas, canti_tareas);
-    getchar();
+    fflush(stdin);
+    scanf("%d", &id);
+    BuscarPorID(TareasPendientes, canti_tareas, id);
+    BuscarPorID(TareasRealizadas, canti_tareas, id);
     return 0;
 }
 
@@ -92,5 +97,23 @@ void Mostrar(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant)
             printf("Duracion: %d\n",TareasRealizadas[i]->Duracion);
             printf("Descripcion: %s\n",TareasRealizadas[i]->Descripcion);
         }
+    }
+}
+
+void BuscarPorID(Tarea **TareaBuscada, int cant_tareas, int id)
+{
+    for(int i = 0;i<cant_tareas;i++)
+    {
+        if(*(&TareaBuscada[i]->TareaID) == id)
+        {
+             printf("============Tarea Econtrada============\n");
+            printf("ID: %d\n",TareaBuscada[i]->TareaID);
+            printf("Duracion: %d\n",TareaBuscada[i]->Duracion);
+            printf("Descripcion: %s\n",TareaBuscada[i]->Descripcion);
+        }else
+        {
+            printf("No se ha encontrado una tarea con ese ID");
+        }
+        
     }
 }
