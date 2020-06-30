@@ -11,8 +11,8 @@ typedef struct Tar{
 
 void CargaTarea(Tarea **TareasPendientes, int cantidad);
 void CambioTareas(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant); 
-void Mostrar(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant);
-void BuscarPorID(Tarea **TareaBuscada, int cant_tareas, int id);
+void Mostrar(Tarea **TareaAMostrar, int cant);
+Tarea **BuscarPorID(Tarea **TareaPendiente, Tarea **TareaRealizada, int cant,  int id);
 
 int main (void){
     srand(time(NULL));
@@ -26,13 +26,18 @@ int main (void){
     }
     Tarea **TareasPendientes = (Tarea **)malloc(sizeof(Tarea*)*canti_tareas);
     Tarea **TareasRealizadas = (Tarea **)malloc(sizeof(Tarea*)*canti_tareas);
+    Tarea **TareaEncontrada = (Tarea **)malloc(sizeof(Tarea*)*canti_tareas);
     CargaTarea(TareasPendientes, canti_tareas);
     CambioTareas(TareasPendientes, TareasRealizadas, canti_tareas);
-    Mostrar(TareasPendientes, TareasRealizadas, canti_tareas);
+    printf("=====Tareas Pendientes===== \n");
+    Mostrar(TareasPendientes, canti_tareas);
+    printf("\n=====Tareas Realizadas=====\n");
+    Mostrar(TareasRealizadas, canti_tareas);
     fflush(stdin);
+    printf("\nIngrese el id de la tarea que quiere buscar: ");
     scanf("%d", &id);
-    BuscarPorID(TareasPendientes, canti_tareas, id);
-    BuscarPorID(TareasRealizadas, canti_tareas, id);
+    TareaEncontrada = BuscarPorID(TareasPendientes, TareasRealizadas, canti_tareas, id);
+    Mostrar(TareaEncontrada, canti_tareas);
     return 0;
 }
 
@@ -64,56 +69,57 @@ void CambioTareas(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant)
         scanf("%c", &resultado);
         fflush(stdin);
         if (resultado == 'y'){
-            TareasRealizadas[j] = (Tarea*) malloc(sizeof(Tarea));
-            TareasRealizadas[j] = TareasPendientes[j];
-            TPendiente = &TareasPendientes[j];
-            *TPendiente = NULL;
+            TareasRealizadas[j] = (Tarea *) malloc(sizeof(Tarea));
+            TareasRealizadas[j]->TareaID = TareasPendientes[j]->TareaID;
+            TareasRealizadas[j]->Duracion = TareasPendientes[j]->Duracion;
+            TareasRealizadas[j]->Descripcion = (char *) malloc(sizeof(char) * strlen(TareasPendientes[j]->Descripcion));
+            strcpy(TareasRealizadas[j]->Descripcion, TareasPendientes[j]->Descripcion);
+            TareasPendientes[j] = NULL;
         }
         else{
-            TRealizado = &TareasRealizadas[j];
-            *TRealizado = NULL;
+            TareasRealizadas[j] = NULL;
         }
     }
 }
-void Mostrar(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant)
+void Mostrar(Tarea **TareaAMostrar, int cant)
 {
-    printf("============Tareas Pendientes============\n");
     for(int i=0;i<cant;i++)
     {
-        if(*(&TareasPendientes[i]) != NULL) 
+        if(TareaAMostrar[i] != NULL)
         {
-            printf("ID: %d\n",TareasPendientes[i]->TareaID);
-            printf("Duracion: %d\n",TareasPendientes[i]->Duracion);
-            printf("Descripcion: %s\n",TareasPendientes[i]->Descripcion);
-        }
-        
-    }
-    printf("============Tareas Realizadas============\n");
-    for(int i=0;i<cant;i++)
-    {
-        if(*(&TareasRealizadas[i]) != NULL)
-        {
-            printf("ID: %d\n",TareasRealizadas[i]->TareaID);
-            printf("Duracion: %d\n",TareasRealizadas[i]->Duracion);
-            printf("Descripcion: %s\n",TareasRealizadas[i]->Descripcion);
+            printf("ID: %d\n",TareaAMostrar[i]->TareaID);
+            printf("Duracion: %d\n",TareaAMostrar[i]->Duracion);
+            printf("Descripcion: %s\n",TareaAMostrar[i]->Descripcion);
         }
     }
 }
 
-void BuscarPorID(Tarea **TareaBuscada, int cant_tareas, int id)
+Tarea **BuscarPorID(Tarea **TareaPendiente, Tarea **TareaRealizada, int cant, int id)
 {
-    for(int i = 0;i<cant_tareas;i++)
+    Tarea **Aux;
+    for(int i = 0; i < cant;i++)
     {
-        if(*(&TareaBuscada[i]->TareaID) == id)
+        if(TareaPendiente[i] != NULL)
         {
-             printf("============Tarea Econtrada============\n");
-            printf("ID: %d\n",TareaBuscada[i]->TareaID);
-            printf("Duracion: %d\n",TareaBuscada[i]->Duracion);
-            printf("Descripcion: %s\n",TareaBuscada[i]->Descripcion);
-        }else
-        {
-            printf("No se ha encontrado una tarea con ese ID");
+            if(TareaPendiente[i]->TareaID == id)
+            {
+                Aux[i]=&(*TareaPendiente[i]);
+            }else{
+                Aux[i] = NULL;
+            }
         }
-        
+        for(int j = 0; j<cant;j++)
+        {
+            if (TareaRealizada[j] != NULL)
+            {
+                if(TareaRealizada[j]->TareaID == id)
+                {
+                    Aux[j]=&(*TareaRealizada[j]);
+                }else{
+                    Aux[j] = NULL;
+                }
+            }
+        }
     }
+    return Aux;
 }
