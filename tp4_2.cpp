@@ -11,7 +11,8 @@ typedef struct Tar{
 
 void CargaTarea(Tarea **TareasPendientes, int cantidad);
 void CambioTareas(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant); 
-void Mostrar(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant);
+void Mostrar(Tarea **TareaAMostrar, int cant);
+Tarea **BuscarPorPalabra(Tarea **TareaPend, Tarea **TareaReal, int cant_t);
 
 int main (void){
     srand(time(NULL));
@@ -24,9 +25,13 @@ int main (void){
     }
     Tarea **TareasPendientes = (Tarea **)malloc(sizeof(Tarea*)*canti_tareas);
     Tarea **TareasRealizadas = (Tarea **)malloc(sizeof(Tarea*)*canti_tareas);
+    Tarea **BusqPalabra;
     CargaTarea(TareasPendientes, canti_tareas);
     CambioTareas(TareasPendientes, TareasRealizadas, canti_tareas);
-    Mostrar(TareasPendientes, TareasRealizadas, canti_tareas);
+    Mostrar(TareasPendientes, canti_tareas);
+    Mostrar(TareasRealizadas, canti_tareas);
+    BusqPalabra = BuscarPorPalabra(TareasPendientes, TareasRealizadas, canti_tareas);
+    Mostrar(BusqPalabra, canti_tareas);
     getchar();
     return 0;
 }
@@ -70,27 +75,53 @@ void CambioTareas(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant)
         }
     }
 }
-void Mostrar(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cant)
+void Mostrar(Tarea **TareaAMostrar, int cant)
 {
-    printf("============Tareas Pendientes============\n");
     for(int i=0;i<cant;i++)
     {
-        if(*(&TareasPendientes[i]) != NULL) 
+        if(TareaAMostrar[i] != NULL)
         {
-            printf("ID: %d\n",TareasPendientes[i]->TareaID);
-            printf("Duracion: %d\n",TareasPendientes[i]->Duracion);
-            printf("Descripcion: %s\n",TareasPendientes[i]->Descripcion);
+            printf("ID: %d\n",TareaAMostrar[i]->TareaID);
+            printf("Duracion: %d\n",TareaAMostrar[i]->Duracion);
+            printf("Descripcion: %s\n",TareaAMostrar[i]->Descripcion);
         }
-        
     }
-    printf("============Tareas Realizadas============\n");
-    for(int i=0;i<cant;i++)
+}
+
+Tarea **BuscarPorPalabra(Tarea **TareaPend, Tarea **TareaReal, int cant_t){
+    int boolean;
+    Tarea **Aux = (Tarea**) malloc(sizeof(Tarea));
+    char Cade[100];
+    printf("Ingrese la palabra clave: ");
+    scanf("%s", &Cade);
+    fflush(stdin);
+    for (int i = 0; i < cant_t; i++)
     {
-        if(*(&TareasRealizadas[i]) != NULL)
-        {
-            printf("ID: %d\n",TareasRealizadas[i]->TareaID);
-            printf("Duracion: %d\n",TareasRealizadas[i]->Duracion);
-            printf("Descripcion: %s\n",TareasRealizadas[i]->Descripcion);
+        if(TareaPend[i] != NULL){
+            boolean = strcmp(TareaPend[i]->Descripcion, Cade);
+            if(boolean == 0){
+                Aux[i] = &(*TareaPend[i]);
+                break;
+            }
+            else
+            {
+                Aux[i] = NULL;
+            }
         }
     }
+    for (int j = 0; j < cant_t; j++)
+    {
+        if(TareaReal[j] != NULL){
+            boolean = strcmp(TareaReal[j]->Descripcion, Cade);
+            if(boolean == 0){
+                Aux[j] = &(*TareaReal[j]);
+                break;
+            }
+            else
+            {
+                Aux[j] = NULL;
+            }
+        }
+    }
+    return Aux;
 }
